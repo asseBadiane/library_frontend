@@ -1,4 +1,3 @@
-<p>register works!</p>
 <div class="register-container">
     <h2>Register</h2>
     <form (ngSubmit)="onRegister()">
@@ -16,5 +15,5 @@
       </div>
       <button type="submit" class="btn btn-primary">Register</button>
     </form>
-    <p>Already have an account? <a routerLink="/login">Login here</a></p>
+    <p>Already have an account? <a [routerLink]="['/login']">Login here</a></p>
   </div>

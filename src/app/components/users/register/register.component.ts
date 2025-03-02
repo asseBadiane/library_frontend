@@ -1,25 +1,13 @@
-// import { Component } from '@angular/core';
-
-// @Component({
-//   selector: 'app-register',
-//   imports: [],
-//   templateUrl: './register.component.html',
-//   styleUrl: './register.component.css'
-// })
-// export class RegisterComponent {
-
-// }
-
-// src/app/components/users/register/register.component.ts
 import { Component } from '@angular/core';
 import axios from 'axios';
-import { Router } from '@angular/router';
-import { NgModel } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [NgMode],
+  imports: [FormsModule, RouterModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })

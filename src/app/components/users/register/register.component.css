@@ -21,3 +21,9 @@
     background-color: #007bff;
     border-color: #007bff;
   }
+a {
+    z-index: 1000;
+    position: relative;
+    display: inline-block;
+  }
+  
