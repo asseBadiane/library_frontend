@@ -1,41 +1,53 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-// import { User } from '../models/user.model';
-import { AuthService } from './auth.service';
+import { map, Observable, tap } from 'rxjs';
 import { User } from '../models/user/user.model';
-
-const API_URL = 'http://127.0.0.1:8000/api/users/'; // Assurez-vous que c'est l'URL de votre API Django
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
+  private apiUrl = `${environment.apiUrl}/users`;
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
+  constructor(private http: HttpClient) {}
 
-  getProfile(): Observable<User> {
-    return this.http.get<User>(API_URL + 'me/', this.getHeaders());
+  register(user: User): Observable<User> {
+    return this.http.post<User>(`${this.apiUrl}/register/`, user);
   }
 
-  updateProfile(user: User): Observable<User> {
-      // Assuming the API expects a PUT request to update the profile
-      return this.http.put<User>(API_URL + 'me/', user, this.getHeaders());
+  login(credentials: { username: string; password: string }): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login/`, credentials);
+  }
+
+
+  getProfile(): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/me/`,
+    { headers: new HttpHeaders({ 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }) }
+
+    ).pipe(
+      // tap(response => console.log('Réponse API brute:', response)),
+      map(user => {
+        // Si nécessaire, transformez les données ici pour correspondre à votre interface User
+        return user;
+      })
+    );
+  }
+
+  // Méthode unifiée qui gère les deux cas (avec ou sans image)
+  updateProfile(data: User | FormData): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+    });
+    
+    return this.http.patch(`${this.apiUrl}/me/`, data, { headers });
+  }
+
+  updateProfileWithImage(formData: FormData): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/me/`, formData);
   }
 
   deleteProfile(): Observable<any> {
-    return this.http.delete(API_URL + 'me/', this.getHeaders());
-  }
-
-  private getHeaders(): { headers: HttpHeaders } {
-    const token = this.authService.getToken();
-    if (token) {
-      return {
-        headers: new HttpHeaders({
-          'Authorization': `Bearer ${token}`
-        })
-      };
-    }
-    return { headers: new HttpHeaders() };
+    return this.http.delete<any>(`${this.apiUrl}/me/`);
   }
 }

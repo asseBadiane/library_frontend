@@ -3,10 +3,13 @@ import {
   HttpRequest,
   HttpHandler,
   HttpEvent,
-  HttpInterceptor
+  HttpInterceptor,
+  HttpResponse,
+  HttpInterceptorFn,
+  HttpHandlerFn
 } from '@angular/common/http';
 
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 @Injectable()
@@ -28,3 +31,16 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(request);
   }
 }
+
+export const LoggingInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
+  const startTime = Date.now();
+  return next(req).pipe(
+    tap(event => {
+      if (event instanceof HttpResponse) {
+        const endTime = Date.now();
+        const duration = endTime - startTime;
+        console.log(`${req.method} ${req.urlWithParams} ${duration}ms`);
+      }
+    })
+  );
+};
